@@ -15,22 +15,12 @@ metadata = MetaData()
 #SOLDTO(IDSaleContract,ClientSSN)
 #OWNEDBY(HouseAddress, HouseCity, ClientSSN)
 
-#composite foreign key dalla stessa tabella, esempio che ti servirà è quando vuoi creare una tabella in cui c'è una foreign key da una tabella e 2
-#dalla stessa tabella, come fai a dire che due sono accoppiate e l'altra no è singola?  così! Ma nel caso del soldto non è l'approccio corretto
-# Soldto = Table('Soldto', Base.metadata,
-#     Column('ClientSSN', String(9),nullable=False),
-#     Column('Idsalecontract', String(20),nullable=False),
-#     ForeignKeyConstraint(['ClientSSN', 'Idsalecontract'], ['Clients.SSN', 'Sale.Idsalecontract'])
-# )
-
-
 Soldto = Table('Soldto',Base.metadata,
     Column('ClientSSN',String(9),ForeignKey('Clients.SSN'),nullable=False),
     Column('Idsalecontract',String(20),ForeignKey('Sale.Idsalecontract'),nullable=False)
     )
 
-
-#verifica che sia corretta (3 indici di cui 2 accoppiati ma dubbio primary key? )
+#verifica che sia corretta (3 indici di cui 2 accoppiati ma dubbio se sono primary key accoppiate (2)+1 )
 Ownedby = Table('Ownedby',Base.metadata,
     Column('Houseaddress',String(40),nullable=False),
     Column('Housecity',String(40),nullable=False),
@@ -43,6 +33,63 @@ Rentedby = Table('Rentedby',Base.metadata,
     Column('ClientSSN',String(9),ForeignKey('Clients.SSN'),nullable=False)
     )
 
+class Houses(Base):
+    __tablename__='Houses'
+    Houseaddress = Column(String(40),primary_key=True)
+    Housecity = Column(String(40),primary_key=True)
+    Sizesquaremeters = Column(Float)
+    Rooms = Column(Integer)
+    #many to many relationship
+    parents = relationship("Clients", secondary = Ownedby, back_populates='Houses')
+    #one to many relationship with Sale
+    sold_houses = relationship('Sale')
+    #one to many relationship with RentalContract
+    rented_houses = relationship('Rentalcontract')
+
+class Employee(Base):
+    __tablename__='Employee'
+    Idemployee = Column (String(20),primary_key=True)
+    Lastname = Column(String(20))
+    Firstname = Column(String(20))
+    Phonenumber = Column(String(20))
+    #one to many rel between Employee and Sale, Employee parent
+    sale_associated = relationship('Sale')
+    #one to many rel btw Employee and Rentalcontract
+    managing_empl = relationship('Rentalcontract')
+
+class Rentalcontract(Base):
+    __tablename__='Rentalcontract'
+    Idrentalcontract= Column(String(20), primary_key=True)
+    #one to many rel w\ houses (child)
+    Houseaddress = Column(String(40), nullable= False)
+    Housecity = Column(String(40),nullable=False)
+    Startdate = Column(TIMESTAMP)
+    Enddate = Column(TIMESTAMP)
+    Annualcost = Column(Float)
+    #one to many rel (child) w\ Employee
+    Idemployee = Column(String(20), ForeignKey('Employee.Idemployee'),nullable=False)
+    #many to many rel w\ Clients by means of Rentedby
+    clients_associated = relationship('Clients', secondary=Rentedby, back_populates = 'Rentals')
+    __table_args__ = (ForeignKeyConstraint([Houseaddress, Housecity],
+                                            [Houses.Houseaddress, Houses.Housecity]),
+                       {})
+
+
+class Sale(Base):
+    __tablename__='Sale'
+    Idsalecontract = Column(String(20),primary_key=True)
+    Houseaddress = Column(String(40))
+    Housecity = Column(String(40))
+    Date = Column(TIMESTAMP)
+    Cost = Column(Float)
+    #one to many relationship w\ Employee (child)
+    Idemployee = Column(String(20), ForeignKey('Employee.Idemployee'),nullable=False)
+    #one to many relationship w\ Houses
+    __table_args__ = (ForeignKeyConstraint([Houseaddress, Housecity],
+                                            [Houses.Houseaddress, Houses.Housecity]),
+                       {})
+    #many to many relationship
+    parents = relationship("Clients", secondary = Soldto, back_populates='Sales')
 
 class Clients(Base):
     __tablename__ = 'Clients'
@@ -60,46 +107,6 @@ class Clients(Base):
     houses_associated = relationship("Houses", secondary= Ownedby, back_populates= 'Clients')
     #Clients è in relazione con Rentalcontract tramite Rentedby table
     rental_associated = relationship('Rentalcontract', secondary= Rentedby, back_populates = 'Clients')
-
-class Rentalcontract(Base):
-    __tablename__='Rentalcontract'
-    Idrentalcontract= Column(String(20), primary_key=True)
-    #Houseaddress = Column(String(40), ForeignKey('Houses.Houseaddress'))
-    #Housecity = Column(String(40), ForeignKey('Houses.Housecity'))
-    Startdate = Column(TIMESTAMP)
-    Enddate = Column(TIMESTAMP)
-    Annualcost = Column(Float)
-    #Idemployee = Column(String(20), ForeignKey('Employee.Idemployee'))
-    #many to many rel w\ Clients by means of Rentedby
-    clients_associated = relationship('Clients', secondary=Rentedby, back_populates = 'Rentals')
-
-class Houses(Base):
-    __tablename__='Houses'
-    Houseaddress = Column(String(40),primary_key=True)
-    Housecity = Column(String(40),primary_key=True)
-    Sizesquaremeters = Column(Float)
-    Rooms = Column(Integer)
-    parents = relationship("Clients", secondary = Ownedby, back_populates='Houses')
-
-class Sale(Base):
-    __tablename__='Sale'
-    Idsalecontract = Column(String(20),primary_key=True)
-    Houseaddress = Column(String(40))
-    Housecity = Column(String(40))
-    Date = Column(TIMESTAMP)
-    Cost = Column(Float)
-    # Idemployee = Column(String(20),ForeignKey('Employee.Idemployee'))
-    # __table_args__ = (ForeignKeyConstraint([Houseaddress, Housecity],
-    #                                        [Houses.Houseaddress, Houses.Housecity]),
-    #                   {})
-    parents = relationship("Clients", secondary = Soldto, back_populates='Sales')
-
-# class Employee(Base):
-#     __tablename__='Employee'
-#     Idemployee = Column (String(20),primary_key=True)
-#     Lastname = Column(String(20))
-#     Firstname = Column(String(20))
-#     Phonenumber = Column(String(20))
 
 
 Base.metadata.create_all(engine)
