@@ -41,20 +41,21 @@ class Clients(Base):
     CheckConstraint(Column('Age')<=110)
     Phonenumber = Column(String(20),nullable=False)
     #Clients è in relazione con Sale tramite la SoldTo Table
-    sales_associated = relationship("Sale", secondary = Soldto, back_populates='Clients')
+    Sale = relationship("Sale", secondary = Soldto, back_populates='Clients')
     #Clients è in relazione con Houses tramite Ownedby table
-    houses_associated = relationship("Houses", secondary= Ownedby, back_populates= 'Clients')
+    Houses = relationship("Houses", secondary= Ownedby, back_populates= 'Clients')
     #Clients è in relazione con Rentalcontract tramite Rentedby table
-    rental_associated = relationship('Rentalcontract', secondary= Rentedby, back_populates = 'Clients')
-    def __init__(self, SSN, Lastname, Firstname, Address, City, State, Age, Phonenumber):
+    Rentalcontract = relationship('Rentalcontract', secondary= Rentedby, back_populates = 'Clients')
+    def __init__(self, SSN, Lastname, Firstname, City, State, Age, Phonenumber, Address= None):
         self.SSN = SSN
         self.Lastname = Lastname
         self.Firstname = Firstname
-        self.Address = Address
         self.City = City
         self.State= State
         self.Age = Age
         self.Phonenumber = Phonenumber
+        if Address is not None:
+            self.Address = Address
 
 class Employee(Base):
     __tablename__='Employee'
@@ -79,7 +80,7 @@ class Houses(Base):
     Sizesquaremeters = Column(Float)
     Rooms = Column(Integer)
     #many to many relationship
-    parents = relationship("Clients", secondary = Ownedby, back_populates='Houses')
+    Clients = relationship("Clients", secondary = Ownedby, back_populates='Houses')
     #one to many relationship with Sale (parent)
     sold_houses = relationship('Sale')
     #one to many relationship with RentalContract (parent)
@@ -102,7 +103,7 @@ class Rentalcontract(Base):
     #one to many rel (child) w\ Employee
     Idemployee = Column(String(20), ForeignKey('Employee.Idemployee'),nullable=False)
     #many to many rel w\ Clients by means of Rentedby
-    clients_associated = relationship('Clients', secondary=Rentedby, back_populates = 'Rentals')
+    Clients = relationship('Clients', secondary=Rentedby, back_populates = 'Rentalcontract')
     __table_args__ = (ForeignKeyConstraint([Houseaddress, Housecity],
                                             [Houses.Houseaddress, Houses.Housecity]),
                        {})
@@ -129,7 +130,7 @@ class Sale(Base):
                                             [Houses.Houseaddress, Houses.Housecity]),
                        {})
     #many to many relationship
-    parents = relationship("Clients", secondary = Soldto, back_populates='Sales')
+    Clients = relationship('Clients', secondary = Soldto, back_populates='Sale')
     def __init__(self, Idsalecontract, Houseaddress, Housecity, Date, Cost, Idemployee):
         self.Idsalecontract = Idsalecontract
         self.Houseaddress = Houseaddress
@@ -139,14 +140,15 @@ class Sale(Base):
         self.Idemployee = Idemployee
 
 
-"""
-Base.metadata.create_all(engine)
-
+#Base.metadata.create_all(engine)
+#Base.metadata.clear()
+#Base.metadata.drop_all(engine)
 #create a session 
 Session = sessionmaker(bind=engine)
 session = Session()
 
-session.add_all(
+
+session.add_all([
     Clients(SSN='12844CBA3', Lastname='Amata',Firstname='Giovanni',Address='Via Giuseppe malibondi 56',City='Catania',State='Italy',Age=22,Phonenumber='+39 345884251'),
     Clients(SSN='124663124', Lastname='Xi',Firstname='Wuah',Address='Chan seng SU 12442',State='Hong Kong ',City='Hong Kong',Age=33,Phonenumber='+39 63421231'),
     Clients(SSN='123gsaf21', Lastname='Alberti',Firstname='Damiano',Address='Via Giuseppe Garibaldi 112',City='Hong Kong',State='Italy',Age=22,Phonenumber='+39 345884251'),
@@ -154,7 +156,6 @@ session.add_all(
     Clients(SSN='636we242f', Lastname='Giordani',Firstname='Giovanni',Address='Via Giuseppe malibondi 56',City='Hong Kong',State='Italy',Age=29,Phonenumber='+39 345884251'),
     Clients(SSN='12465r345', Lastname='Franceschino',Firstname='Alessio',City='Napoli',State='Italy',Age=24,Phonenumber='+39 632421412'),
     Clients(SSN='237485443', Lastname='Ciccioli',Firstname='Giuseppe',City='Matera',State='Italy',Age=17,Phonenumber='+39 166452342'),
-)
+])
 session.commit()
-session.quit()
-"""
+
