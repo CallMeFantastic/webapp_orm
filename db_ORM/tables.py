@@ -102,7 +102,7 @@ class Rentalcontract(Base):
                                             [Houses.Houseaddress, Houses.Housecity]),
                        {})
     def __init__(self, Idrentalcontract, Houseaddress, Housecity, Startdate, Annualcost, Idemployee, Enddate = None):
-        self.Idemployee = Idemployee
+        self.Idrentalcontract = Idrentalcontract
         self.Houseaddress = Houseaddress
         self.Housecity = Housecity
         self.Startdate = Startdate

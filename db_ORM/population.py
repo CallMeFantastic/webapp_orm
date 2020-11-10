@@ -1,5 +1,6 @@
 from tables import Sale,Clients,Houses,Rentedby,Rentalcontract,Ownedby,Soldto,Employee
-from database import session
+from sqlalchemy import MetaData
+from database import session,engine
 
 
 #CLIENTS (SSN, Lastname, Firstname, Address, City, State, Age, PhoneNumber)
@@ -11,9 +12,11 @@ from database import session
 #RENTEDBY
 #EMPLOYEE
 
+#needed for insertion in metadata Tables
+conn = engine.connect()
 
 #if you get an error here check the validity of the attributes values, foreign key constraint are checked automatically as well as CheckConstraint
-"""
+
 session.add_all([
     Clients(SSN='12844CBA3', Lastname='Amata',Firstname='Giovanni',Address='Via Giuseppe malibondi 56',City='Catania',State='Italy',Age=24,Phonenumber='+39 345884251'),
     Clients(SSN='124663124', Lastname='Xi',Firstname='Wuah',Address='Chan seng SU 12442',State='Hong Kong ',City='Hong Kong',Age=33,Phonenumber='+39 63421231'),
@@ -58,8 +61,61 @@ session.add_all([
     Sale(Idsalecontract='62321455',Houseaddress='Via Giulii 12', Housecity='Bergamo',Date='2009/03/21',Cost=31200.00,Idemployee='56236322'),
     Sale(Idsalecontract='52163255',Houseaddress='Via Giulii 12', Housecity='Bergamo',Date='2007/03/12',Cost=200.00,Idemployee='73252342'),
 
+    Rentalcontract(Idrentalcontract='1s512ca',Houseaddress='Via Giulii 12',Housecity='Bergamo',Startdate='2007/12/12',Annualcost=4000,Idemployee='MAts1231',Enddate='2008/12/12'),
+    Rentalcontract(Idrentalcontract='q42124',Houseaddress='Via Giulii 12',Housecity='Bergamo',Startdate='2007/12/12',Annualcost=4000,Idemployee='21321412',Enddate='2008/12/12'),
+    Rentalcontract(Idrentalcontract='2152151',Houseaddress='Via Veneto 12',Housecity='Monza',Startdate='2007/12/12',Annualcost=4500,Idemployee='21321412',Enddate='2008/12/12'),
+    Rentalcontract(Idrentalcontract='215asf12',Houseaddress='Via Ambolari 12',Housecity='Brescia',Startdate='2006/12/12',Annualcost=5000,Idemployee='62355212',Enddate='2007/12/12'),
+    Rentalcontract(Idrentalcontract='215af213',Houseaddress='Via Manzoni 12',Housecity='Genova',Startdate='2007/12/12',Annualcost=3000,Idemployee='73252342',Enddate='2008/12/12'),
+    Rentalcontract(Idrentalcontract='215fs123',Houseaddress='Via Giulii 12',Housecity='Bergamo',Startdate='2007/12/12',Annualcost=2000,Idemployee='52421421'),
+
 
 ])
-"""
 
+conn.execute(Ownedby.insert(),[
+   {'Houseaddress':'Via Gigi 12','Housecity':'Catania','ClientSSN':'5215dg612'},
+   {'Houseaddress':'Via Gigi 12','Housecity':'Catania','ClientSSN':'123gsaf21'},
+   {'Houseaddress':'Via Veneto 12','Housecity':'Monza','ClientSSN':'123gsaf21'},
+   {'Houseaddress':'Via Ambolari 12','Housecity':'Brescia','ClientSSN':'5215dg612'},
+   {'Houseaddress':'Via Ambolari 12','Housecity':'Brescia','ClientSSN':'192742111'},
+   {'Houseaddress':'Via Ambolari 12','Housecity':'Brescia','ClientSSN':'122131241'},
+   {'Houseaddress':'Via Manzoni 12','Housecity':'Genova','ClientSSN':'12465r345'},
+   {'Houseaddress':'Via Giglio 112','Housecity':'Beverly Hills','ClientSSN':'192742111'},
+   {'Houseaddress':'Via Gastro 25','Housecity':'Pavia','ClientSSN':'192742111'},
+   {'Houseaddress':'Via Pavinco 98','Housecity':'Padova','ClientSSN':'122131241'},
+   {'Houseaddress':'XUAN JIN 11332','Housecity':'Hong Kong','ClientSSN':'124214123'}
+   
+   ])
+
+conn.execute(Soldto.insert(),[
+   {'Idsalecontract':'12522145','ClientSSN':'12844CBA3'},
+   {'Idsalecontract':'52363225','ClientSSN':'5215dg612'},
+   {'Idsalecontract':'25322155','ClientSSN':'122131241'},
+
+   {'Idsalecontract':'62321455','ClientSSN':'12465r345'},
+   {'Idsalecontract':'25322155','ClientSSN':'122135211'},
+   {'Idsalecontract':'21421415','ClientSSN':'124663124'},
+
+   {'Idsalecontract':'62324125','ClientSSN':'5215dg612'},
+   {'Idsalecontract':'52363225','ClientSSN':'192742111'},
+   {'Idsalecontract':'21421214','ClientSSN':'237485443'},
+
+   {'Idsalecontract':'52363225','ClientSSN':'5215dg612'},
+   {'Idsalecontract':'21235555','ClientSSN':'124663124'},
+  
+   ])
+
+conn.execute(Rentedby.insert(),[
+   {'Idrentalcontract':'1s512ca','ClientSSN':'12844CBA3'},
+   {'Idrentalcontract':'q42124','ClientSSN':'124663124'},
+   {'Idrentalcontract':'2152151','ClientSSN':'5215dg612'},
+
+   {'Idrentalcontract':'215asf12','ClientSSN':'636we242f'},
+   {'Idrentalcontract':'215fs123','ClientSSN':'192742111'},
+   {'Idrentalcontract':'215af213','ClientSSN':'122131241'},
+
+   {'Idrentalcontract':'1s512ca','ClientSSN':'12465r345'},
+   {'Idrentalcontract':'q42124','ClientSSN':'5215dg612'},
+   {'Idrentalcontract':'215asf12','ClientSSN':'124663124'},
+  
+   ])
 session.commit()

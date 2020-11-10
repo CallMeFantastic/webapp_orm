@@ -8,12 +8,12 @@ Base = declarative_base()
 engine = create_engine("mysql://root:@127.0.0.1/LALuxuryHouses")
 
 #2, if needed, to start the creation of tables and (optionally the population of the entire db)
-from tables import *
+from tables import Sale,Soldto,Rentalcontract,Rentedby,Ownedby,Houses,Clients,Employee
 #3, if needed, to commit the creation of tables
 Base.metadata.create_all(engine)
 
 #to clear the database
-#from tables import *
+from tables import *
 #Base.metadata.drop_all(engine)
 #Base.metadata.clear()
 
