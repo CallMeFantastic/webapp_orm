@@ -1,9 +1,8 @@
 from sqlalchemy import create_engine,Table,Column,Integer,String,ForeignKey,Float,ForeignKeyConstraint,MetaData,Date,CheckConstraint
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm.session import sessionmaker,Session
 from sqlalchemy.orm import relationship
 
-from database import Base
+Base = declarative_base()
 
 #----------------tables
 
@@ -134,7 +133,3 @@ class Sale(Base):
         self.Date = Date
         self.Cost = Cost
         self.Idemployee = Idemployee
-
-
-#if you want to populate, otherwise comment it
-from population import *

@@ -1,23 +1,10 @@
 from tables import Sale,Clients,Houses,Rentedby,Rentalcontract,Ownedby,Soldto,Employee
 from sqlalchemy import MetaData
-from database import session,engine
 
-
-#CLIENTS (SSN, Lastname, Firstname, Address, City, State, Age, PhoneNumber)
-#SALE(IDSaleContract, HouseAddress, HouseCity, Date, Cost, IDEmployee)
-#SOLDTO(IDSaleContract,ClientSSN)
-#OWNEDBY(HouseAddress, HouseCity, ClientSSN)
-#HOUSES(HouseAddress, HouseCity, SizeSquareMeters, Rooms)
-#RENTAL-CONTRACT (IDRentContract, HouseAddress, HouseCity, StartDate, EndDate, AnnualCost, IDEmployee)
-#RENTEDBY
-#EMPLOYEE
-
-#needed for insertion in metadata Tables
-conn = engine.connect()
 
 #if you get an error here check the validity of the attributes values, foreign key constraint are checked automatically as well as CheckConstraint
-
-session.add_all([
+def basic_tables(session):
+   session.add_all([
     Clients(SSN='12844CBA3', Lastname='Amata',Firstname='Giovanni',Address='Via Giuseppe malibondi 56',City='Catania',State='Italy',Age=24,Phonenumber='+39 345884251'),
     Clients(SSN='124663124', Lastname='Xi',Firstname='Wuah',Address='Chan seng SU 12442',State='Hong Kong ',City='Hong Kong',Age=33,Phonenumber='+39 63421231'),
     Clients(SSN='123gsaf21', Lastname='Alberti',Firstname='Damiano',Address='Via Giuseppe Garibaldi 112',City='Hong Kong',State='Italy',Age=22,Phonenumber='+39 345884251'),
@@ -71,51 +58,44 @@ session.add_all([
 
 ])
 
-conn.execute(Ownedby.insert(),[
-   {'Houseaddress':'Via Gigi 12','Housecity':'Catania','ClientSSN':'5215dg612'},
-   {'Houseaddress':'Via Gigi 12','Housecity':'Catania','ClientSSN':'123gsaf21'},
-   {'Houseaddress':'Via Veneto 12','Housecity':'Monza','ClientSSN':'123gsaf21'},
-   {'Houseaddress':'Via Ambolari 12','Housecity':'Brescia','ClientSSN':'5215dg612'},
-   {'Houseaddress':'Via Ambolari 12','Housecity':'Brescia','ClientSSN':'192742111'},
-   {'Houseaddress':'Via Ambolari 12','Housecity':'Brescia','ClientSSN':'122131241'},
-   {'Houseaddress':'Via Manzoni 12','Housecity':'Genova','ClientSSN':'12465r345'},
-   {'Houseaddress':'Via Giglio 112','Housecity':'Beverly Hills','ClientSSN':'192742111'},
-   {'Houseaddress':'Via Gastro 25','Housecity':'Pavia','ClientSSN':'192742111'},
-   {'Houseaddress':'Via Pavinco 98','Housecity':'Padova','ClientSSN':'122131241'},
-   {'Houseaddress':'XUAN JIN 11332','Housecity':'Hong Kong','ClientSSN':'124214123'}
-   
-   ])
+def auxiliary_tables_population(engine):
+   conn = engine.connect()
+   conn.execute(Ownedby.insert(),[
+      {'Houseaddress':'Via Gigi 12','Housecity':'Catania','ClientSSN':'5215dg612'},
+      {'Houseaddress':'Via Gigi 12','Housecity':'Catania','ClientSSN':'123gsaf21'},
+      {'Houseaddress':'Via Veneto 12','Housecity':'Monza','ClientSSN':'123gsaf21'},
+      {'Houseaddress':'Via Ambolari 12','Housecity':'Brescia','ClientSSN':'5215dg612'},
+      {'Houseaddress':'Via Ambolari 12','Housecity':'Brescia','ClientSSN':'192742111'},
+      {'Houseaddress':'Via Ambolari 12','Housecity':'Brescia','ClientSSN':'122131241'},
+      {'Houseaddress':'Via Manzoni 12','Housecity':'Genova','ClientSSN':'12465r345'},
+      {'Houseaddress':'Via Giglio 112','Housecity':'Beverly Hills','ClientSSN':'192742111'},
+      {'Houseaddress':'Via Gastro 25','Housecity':'Pavia','ClientSSN':'192742111'},
+      {'Houseaddress':'Via Pavinco 98','Housecity':'Padova','ClientSSN':'122131241'},
+      {'Houseaddress':'XUAN JIN 11332','Housecity':'Hong Kong','ClientSSN':'124214123'}
+         ])
 
-conn.execute(Soldto.insert(),[
-   {'Idsalecontract':'12522145','ClientSSN':'12844CBA3'},
-   {'Idsalecontract':'52363225','ClientSSN':'5215dg612'},
-   {'Idsalecontract':'25322155','ClientSSN':'122131241'},
+   conn.execute(Soldto.insert(),[
+      {'Idsalecontract':'12522145','ClientSSN':'12844CBA3'},
+      {'Idsalecontract':'52363225','ClientSSN':'5215dg612'},
+      {'Idsalecontract':'25322155','ClientSSN':'122131241'},
+      {'Idsalecontract':'62321455','ClientSSN':'12465r345'},
+      {'Idsalecontract':'25322155','ClientSSN':'122135211'},
+      {'Idsalecontract':'21421415','ClientSSN':'124663124'},
+      {'Idsalecontract':'62324125','ClientSSN':'5215dg612'},
+      {'Idsalecontract':'52363225','ClientSSN':'192742111'},
+      {'Idsalecontract':'21421214','ClientSSN':'237485443'},
+      {'Idsalecontract':'52363225','ClientSSN':'5215dg612'},
+      {'Idsalecontract':'21235555','ClientSSN':'124663124'}
+         ])
 
-   {'Idsalecontract':'62321455','ClientSSN':'12465r345'},
-   {'Idsalecontract':'25322155','ClientSSN':'122135211'},
-   {'Idsalecontract':'21421415','ClientSSN':'124663124'},
-
-   {'Idsalecontract':'62324125','ClientSSN':'5215dg612'},
-   {'Idsalecontract':'52363225','ClientSSN':'192742111'},
-   {'Idsalecontract':'21421214','ClientSSN':'237485443'},
-
-   {'Idsalecontract':'52363225','ClientSSN':'5215dg612'},
-   {'Idsalecontract':'21235555','ClientSSN':'124663124'},
-  
-   ])
-
-conn.execute(Rentedby.insert(),[
-   {'Idrentalcontract':'1s512ca','ClientSSN':'12844CBA3'},
-   {'Idrentalcontract':'q42124','ClientSSN':'124663124'},
-   {'Idrentalcontract':'2152151','ClientSSN':'5215dg612'},
-
-   {'Idrentalcontract':'215asf12','ClientSSN':'636we242f'},
-   {'Idrentalcontract':'215fs123','ClientSSN':'192742111'},
-   {'Idrentalcontract':'215af213','ClientSSN':'122131241'},
-
-   {'Idrentalcontract':'1s512ca','ClientSSN':'12465r345'},
-   {'Idrentalcontract':'q42124','ClientSSN':'5215dg612'},
-   {'Idrentalcontract':'215asf12','ClientSSN':'124663124'},
-  
-   ])
-session.commit()
+   conn.execute(Rentedby.insert(),[
+      {'Idrentalcontract':'1s512ca','ClientSSN':'12844CBA3'},
+      {'Idrentalcontract':'q42124','ClientSSN':'124663124'},
+      {'Idrentalcontract':'2152151','ClientSSN':'5215dg612'},
+      {'Idrentalcontract':'215asf12','ClientSSN':'636we242f'},
+      {'Idrentalcontract':'215fs123','ClientSSN':'192742111'},
+      {'Idrentalcontract':'215af213','ClientSSN':'122131241'},
+      {'Idrentalcontract':'1s512ca','ClientSSN':'12465r345'},
+      {'Idrentalcontract':'q42124','ClientSSN':'5215dg612'},
+      {'Idrentalcontract':'215asf12','ClientSSN':'124663124'}
+         ])
